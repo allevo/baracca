@@ -49,7 +49,6 @@ jobs:
   docker:
     needs: [fe, be]
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
@@ -60,6 +59,15 @@ jobs:
       run: heroku container:login
     - name: Publish
       run: docker push registry.heroku.com/${HEROKU_APP}/web:latest
+  
+  release:
+    needs: [docker]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Login to container registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: heroku container:login
     - name: Release
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
