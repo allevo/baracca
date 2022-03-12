@@ -10,25 +10,7 @@ env:
 
 jobs:
 
-  before:
-    runs-on: ubuntu-latest
-    environment: HEROKU
-    steps:
-    - uses: actions/checkout@v2
-    - name: Echo
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        FOO: ${{ secrets.FOO }}
-      run: echo $FOO && echo ${{ secrets.FOO }}
-    - name: Login to container registry
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:login
-    - name: Publish
-      run: docker pull registry.heroku.com/${HEROKU_APP}/web:latest
-
   fe:
-    needs: [before]
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
@@ -44,7 +26,6 @@ jobs:
         env:
           CI: true
   be:
-    needs: [before]
     runs-on: ubuntu-latest
     services:
       mongo:
@@ -68,6 +49,7 @@ jobs:
 
   docker:
     needs: [fe, be]
+    environment: HEROKU
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -83,12 +65,11 @@ jobs:
   release:
     needs: [docker]
     runs-on: ubuntu-latest
+    environment: HEROKU
     steps:
     - name: Login to container registry
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: heroku container:login
     - name: Release
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
       run: heroku container:release -a ${HEROKU_APP} web
