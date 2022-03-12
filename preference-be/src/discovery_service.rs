@@ -55,7 +55,7 @@ pub struct DiscoveryResult {
     square_meters: Option<u32>,
 }
 
-fn extract_data(body: &String, discovery_result: &mut DiscoveryResult) {
+fn extract_data(body: &str, discovery_result: &mut DiscoveryResult) {
     let position_description: Option<_> = body.lines().find(|l| l.contains("id=\"js-hydration\">"));
 
     let position_description = match position_description {
@@ -64,8 +64,8 @@ fn extract_data(body: &String, discovery_result: &mut DiscoveryResult) {
     };
 
     let (start, end) = match (
-        position_description.find(">"),
-        position_description.rfind("<"),
+        position_description.find('>'),
+        position_description.rfind('<'),
     ) {
         (Some(start), Some(end)) => (start, end),
         _ => return,
@@ -96,7 +96,7 @@ fn extract_data(body: &String, discovery_result: &mut DiscoveryResult) {
     discovery_result.zone = location.microzone.and_then(|c| c.name);
 }
 
-fn extract_planimetry(body: &String, discovery_result: &mut DiscoveryResult) {
+fn extract_planimetry(body: &str, discovery_result: &mut DiscoveryResult) {
     let lines: Vec<_> = body
         .lines()
         .tuple_windows::<(_, _)>()
