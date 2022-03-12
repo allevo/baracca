@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+*.ts
+.git
+.gitignore
+k8s
+
+
+preference-be/target
+preference-be/Dockerfile
+preference-be/.dockerignore
+preference-be/.git
+preference-be/.gitignore
+preference-be/recipe.json

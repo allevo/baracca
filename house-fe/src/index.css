@@ -1,0 +1,57 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+.leaflet-marker-icon {
+  background-color: transparent;
+  border: 0px;
+}
+
+
+.leaflet-marker-icon img.vote-10 {
+  filter: invert(58%) sepia(34%) saturate(4015%) hue-rotate(86deg) brightness(104%) contrast(113%);
+}
+.leaflet-marker-icon img.vote-9 {
+  filter: invert(53%) sepia(75%) saturate(2597%) hue-rotate(89deg) brightness(98%) contrast(95%);
+}
+.leaflet-marker-icon img.vote-8 {
+  filter: invert(28%) sepia(84%) saturate(1242%) hue-rotate(98deg) brightness(95%) contrast(96%);
+}
+.leaflet-marker-icon img.vote-7 {
+  filter: invert(41%) sepia(22%) saturate(2064%) hue-rotate(41deg) brightness(99%) contrast(99%);
+}
+.leaflet-marker-icon img.vote-6 {
+  filter: invert(78%) sepia(17%) saturate(6594%) hue-rotate(17deg) brightness(93%) contrast(100%);
+}
+.leaflet-marker-icon img.vote-5 {
+  filter: invert(74%) sepia(44%) saturate(5327%) hue-rotate(14deg) brightness(98%) contrast(87%);
+}
+.leaflet-marker-icon img.vote-4 {
+  filter: invert(60%) sepia(52%) saturate(4381%) hue-rotate(9deg) brightness(90%) contrast(87%);
+}
+.leaflet-marker-icon img.vote-3 {
+  filter: invert(36%) sepia(20%) saturate(4708%) hue-rotate(3deg) brightness(103%) contrast(87%);
+}
+.leaflet-marker-icon img.vote-2 {
+  filter: invert(30%) sepia(94%) saturate(4178%) hue-rotate(14deg) brightness(94%) contrast(89%);
+}
+.leaflet-marker-icon img.vote-1 {
+  filter: invert(22%) sepia(42%) saturate(6908%) hue-rotate(357deg) brightness(82%) contrast(97%);
+}
+.leaflet-marker-icon img.vote-undefined, .leaflet-marker-icon img.vote-NaN, .leaflet-marker-icon img.vote-null, .leaflet-marker-icon img.vote- {
+  filter: invert(0%) sepia(98%) saturate(14%) hue-rotate(0deg) brightness(91%) contrast(100%);
+}
