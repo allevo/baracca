@@ -235,7 +235,7 @@ mod tests {
 
     async fn connect_mongo() -> mongodb::Collection<HouseEntity> {
         let mut client_options = ClientOptions::parse_with_resolver_config(
-            "mongodb://localhost/test",
+            get_mongo_url(),
             ResolverConfig::cloudflare(),
         )
         .await
@@ -253,5 +253,11 @@ mod tests {
         let db = client.database(&database_name);
 
         db.collection("houses")
+    }
+
+    fn get_mongo_url() -> String {
+        let host = std::env::var("MONGODB_HOST").unwrap_or("localhost".to_string());
+        let port = std::env::var("MONGODB_PORT").unwrap_or("27017".to_string());
+        format!("mongodb://{}:{}/test", host, port)
     }
 }
