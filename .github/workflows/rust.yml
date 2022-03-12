@@ -14,12 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build -t registry.heroku.com/${HEROKU_APP}/web:latest .
+
     - name: Login to container registry
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:login
+      run: echo ${{ secrets.HEROKU_API_KEY }} | wc -c && heroku container:login
     - name: Publish
       run: docker pull registry.heroku.com/${HEROKU_APP}/web:latest
 
