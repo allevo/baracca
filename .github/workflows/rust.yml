@@ -12,6 +12,7 @@ jobs:
 
   before:
     runs-on: ubuntu-latest
+    environment: HEROKU
     steps:
     - uses: actions/checkout@v2
     - name: Echo
