@@ -18,7 +18,7 @@ jobs:
     - name: Login to container registry
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: echo ${{ secrets.HEROKU_API_KEY }} | wc -c && heroku container:login
+      run: echo "$HEROKU_API_KEY" | wc -c && heroku container:login
     - name: Publish
       run: docker pull registry.heroku.com/${HEROKU_APP}/web:latest
 
