@@ -14,11 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-
+    - name: Echo
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        FOO: ${{ secrets.FOO }}
+      run: echo $FOO && echo ${{ secrets.FOO }}
     - name: Login to container registry
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: echo "$HEROKU_API_KEY" | wc -c && heroku container:login
+      run: heroku container:login
     - name: Publish
       run: docker pull registry.heroku.com/${HEROKU_APP}/web:latest
 
