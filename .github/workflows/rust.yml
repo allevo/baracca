@@ -9,7 +9,22 @@ env:
   HEROKU_APP: baracca
 
 jobs:
+
+  before:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build -t registry.heroku.com/${HEROKU_APP}/web:latest .
+    - name: Login to container registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: heroku container:login
+    - name: Publish
+      run: docker pull registry.heroku.com/${HEROKU_APP}/web:latest
+
   fe:
+    needs: [before]
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
@@ -25,6 +40,7 @@ jobs:
         env:
           CI: true
   be:
+    needs: [before]
     runs-on: ubuntu-latest
     services:
       mongo:
