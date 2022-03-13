@@ -5,6 +5,7 @@ import { setupServer } from 'msw/node'
 
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { rest } from 'msw';
+import { MemoryRouter, Routes } from 'react-router-dom';
 
 const createTestQueryClient = () => new QueryClient({
   defaultOptions: {
@@ -17,13 +18,13 @@ const createTestQueryClient = () => new QueryClient({
 export function renderWithClient(ui: React.ReactElement) {
   const testQueryClient = createTestQueryClient()
   const { rerender, ...result } = render(
-    <QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>
+    <QueryClientProvider client={testQueryClient}><MemoryRouter>{ui}</MemoryRouter></QueryClientProvider>
   )
   return {
     ...result,
     rerender: (rerenderUi: React.ReactElement) =>
       rerender(
-        <QueryClientProvider client={testQueryClient}>{rerenderUi}</QueryClientProvider>
+        <QueryClientProvider client={testQueryClient}><MemoryRouter>{rerenderUi}</MemoryRouter></QueryClientProvider>
       ),
   }
 }

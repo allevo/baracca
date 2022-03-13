@@ -7,6 +7,7 @@ use crate::{
     discovery_service::{DiscoveryError, DiscoveryResult, DiscoveryService},
     house_service::{
         HouseDTO, HouseDTOInsert, HouseDTOInserted, HousesService, HousesServiceError,
+        UpdateHouseDTO,
     },
 };
 
@@ -29,6 +30,25 @@ pub async fn remove_house(
 pub async fn get_houses(houses_service: HousesService) -> Result<impl warp::Reply, Rejection> {
     let houses = houses_service.get_houses().await?;
     Ok(warp::reply::json(&houses))
+}
+
+pub async fn get_house_by_id(
+    house_id: String,
+    houses_service: HousesService,
+) -> Result<impl warp::Reply, Rejection> {
+    let house = houses_service.get_house_by_id(house_id).await?;
+    Ok(warp::reply::json(&house))
+}
+
+pub async fn update_house_by_id(
+    house_id: String,
+    update_field: UpdateHouseDTO,
+    houses_service: HousesService,
+) -> Result<impl warp::Reply, Rejection> {
+    let house = houses_service
+        .update_house_by_id(house_id, update_field)
+        .await?;
+    Ok(warp::reply::json(&house))
 }
 
 pub async fn discover(

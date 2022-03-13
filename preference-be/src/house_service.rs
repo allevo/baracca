@@ -3,7 +3,7 @@ use std::str::FromStr;
 use futures::TryStreamExt;
 use mongodb::{
     bson::{doc, oid::ObjectId},
-    options::{InsertOneOptions, UpdateOptions},
+    options::UpdateOptions,
     results::InsertOneResult,
     Collection,
 };
@@ -44,10 +44,7 @@ impl HousesService {
         let house: HouseEntity = house.into();
 
         info!("Inserting....");
-        let res = self
-            .collection
-            .insert_one(house, InsertOneOptions::default())
-            .await?;
+        let res = self.collection.insert_one(house, None).await?;
         info!("Inserted");
 
         res.try_into()
@@ -86,6 +83,48 @@ impl HousesService {
         let houses = houses.into_iter().map(HouseDTO::from).collect();
 
         Ok(houses)
+    }
+
+    pub async fn get_house_by_id(&self, id: String) -> Result<HouseDTO> {
+        let obj_id = ObjectId::from_str(&id)?;
+
+        let ret = self
+            .collection
+            .find_one(
+                doc! {
+                    "_id": obj_id,
+                },
+                None,
+            )
+            .await?;
+
+        let h = match ret {
+            None => return Result::Err(HousesServiceError::HouseNotFound(id)),
+            Some(h) => h,
+        };
+
+        Ok(h.into())
+    }
+
+    pub async fn update_house_by_id(&self, id: String, update_field: UpdateHouseDTO) -> Result<()> {
+        let obj_id = ObjectId::from_str(&id)?;
+
+        let filter = doc! {"_id": obj_id};
+        let update = doc! { "$set": {
+            "vote": update_field.vote,
+            "comment": update_field.comment,
+        } };
+
+        let ret = self
+            .collection
+            .find_one_and_update(filter, update, None)
+            .await?;
+
+        if ret.is_none() {
+            return Result::Err(HousesServiceError::HouseNotFound(id));
+        }
+
+        Ok(())
     }
 }
 
@@ -193,6 +232,12 @@ impl From<HouseEntity> for HouseDTO {
             square_meters: e.square_meters,
         }
     }
+}
+
+#[derive(Deserialize)]
+pub struct UpdateHouseDTO {
+    comment: Option<String>,
+    vote: Option<i32>,
 }
 
 #[cfg(test)]

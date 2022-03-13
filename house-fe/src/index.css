@@ -55,3 +55,23 @@ html, body, #root {
 .leaflet-marker-icon img.vote-undefined, .leaflet-marker-icon img.vote-NaN, .leaflet-marker-icon img.vote-null, .leaflet-marker-icon img.vote- {
   filter: invert(0%) sepia(98%) saturate(14%) hue-rotate(0deg) brightness(91%) contrast(100%);
 }
+
+/*
+nav > a {
+  width: 53px;
+  height: 53px;
+  padding: 9px;
+  text-align: center;
+  align-items: center;
+  vertical-align: middle;
+  justify-content: center;
+}
+
+nav > a > svg {
+  font-size: 1.25rem;
+}
+nav > a.active > svg {
+  font-size: 2.1875rem;
+  color: -webkit-activelink;
+}
+*/

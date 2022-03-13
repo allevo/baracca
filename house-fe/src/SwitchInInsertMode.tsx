@@ -1,55 +1,67 @@
-import { Radio } from '@material-ui/core';
+import { createStyles, makeStyles, Theme } from '@material-ui/core';
 import { Add, List, Map } from '@material-ui/icons';
+import { NavLink } from 'react-router-dom';
 
-export enum Mode {
-    Insert = 'insert',
-    View = 'view',
-    Map = 'map',
-}
 
-export function SwitchInInsertMode({ mode, onChangeMode }: SwitchInInsertModeProp) {
-    const name = 'switch-mode'
-    const style = { width: 53, height: 53 }
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        nav: {
+            paddingTop: theme.spacing(1),
+            paddingBottom: theme.spacing(1),
+            alignItems: 'center',
+            textAlign: 'center',
+            verticalAlign: 'middle',
+            justifyContent: 'center',
+        },
+        navlink: {
+            width: '53px',
+            height: '53px',
+            padding: theme.spacing(2),
+            textAlign: 'center',
+            alignItems: 'center',
+            verticalAlign: 'middle',
+            justifyContent: 'center',
+        },
+        notActive: {
+            color: theme.palette.grey[400]
+        },
+        active: {
+            color: theme.palette.secondary.main
+        },
+        icon: {
+            fontSize: '1.25rem',
+        },
+    }),
+);
+
+export function SwitchInInsertMode() {
+    const classes = useStyles();
     return (
-        <div>
-            <Radio
-                style={style}
-                checked={mode === Mode.Insert}
-                onChange={_ => onChangeMode(Mode.Insert)}
-                value={Mode.Insert}
-                name={name}
-                inputProps={{ 'aria-label': Mode.Insert }}
-                icon={<Add fontSize="small" />}
-                checkedIcon={<Add fontSize="large" />}
-            />
-            <Radio
-                style={style}
-                checked={mode === Mode.View}
-                onChange={_ => onChangeMode(Mode.View)}
-                value={Mode.View}
-                name={name}
-                inputProps={{ 'aria-label': Mode.View }}
-                icon={<List fontSize="small" />}
-                checkedIcon={<List fontSize="large" />}
-            />
-            <Radio
-                style={style}
-                checked={mode === Mode.Map}
-                onChange={_ => onChangeMode(Mode.Map)}
-                value={Mode.Map}
-                name={name}
-                inputProps={{ 'aria-label': Mode.Map }}
-                icon={<Map fontSize="small" />}
-                checkedIcon={<Map fontSize="large" />}
-            />
-        </div>
+        <nav className={classes.nav}>
+            <NavLink
+                className={classes.navlink}
+                to={`insert`}
+                key={'insert'}
+            >
+                {({ isActive }) => <Add fontSize={isActive ? 'large' : 'small'} className={isActive ? classes.active : classes.notActive} />}
+            </NavLink>
+
+            <NavLink
+                className={classes.navlink}
+                to={`list`}
+                key={'list'}
+            >
+                {({ isActive }) => <List fontSize={isActive ? 'large' : 'small'} className={isActive ? classes.active : classes.notActive} />}
+            </NavLink>
+
+            <NavLink
+                className={classes.navlink}
+                to={`map`}
+                key={'map'}
+            >
+                {({ isActive }) => <Map fontSize={isActive ? 'large' : 'small'} className={isActive ? classes.active : classes.notActive} />}
+            </NavLink>
+        </nav >
 
     )
-}
-
-type OnChangeModeFunction = (newMode: Mode) => void;
-
-interface SwitchInInsertModeProp {
-    mode: Mode,
-    onChangeMode: OnChangeModeFunction,
 }

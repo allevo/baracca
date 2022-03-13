@@ -50,6 +50,19 @@ async fn main() {
         .and(houses_service.clone())
         .and_then(http_handlers::get_houses);
 
+    let get_house_by_id = warp::path!("api" / "houses" / String)
+        .and(warp::get())
+        .and(log_req())
+        .and(houses_service.clone())
+        .and_then(http_handlers::get_house_by_id);
+
+    let update_house_by_id = warp::path!("api" / "houses" / String)
+        .and(warp::patch())
+        .and(warp::body::json())
+        .and(log_req())
+        .and(houses_service.clone())
+        .and_then(http_handlers::update_house_by_id);
+
     let discover = warp::path!("api" / "discover")
         .and(warp::get())
         .and(log_req())
@@ -61,6 +74,8 @@ async fn main() {
 
     let router = insert_house
         .or(get_houses)
+        .or(get_house_by_id)
+        .or(update_house_by_id)
         .or(remove_house)
         .or(discover)
         .or(static_files)
