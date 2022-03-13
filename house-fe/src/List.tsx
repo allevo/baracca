@@ -1,15 +1,14 @@
 import { Grid, IconButton, ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import { Delete } from '@material-ui/icons';
+import { HTMLAttributes } from 'react';
 
 import { useMutation, useQuery } from 'react-query'
 import { InsertHouseDto } from './InsertHouse'
 
 export default function ListHouses() {
     const housesQuery = useQuery<HouseDTO[]>('houses', () =>
-        fetch('/api/houses').then(res =>
-            res.json()
-        )
+        fetch('/api/houses').then(res => res.json())
     )
 
     const removeHouseMutation = useMutation((id: string) => {
@@ -35,10 +34,10 @@ export default function ListHouses() {
             {
                 housesQuery.data.map(d => {
                     return (
-                        <ListItem key={d.id}>
+                        <ListItem key={d.id} ContainerProps={{ 'data-testid': 'item-list-' + d.id } as HTMLAttributes<HTMLDivElement>}>
                             <ListItemText primary={`${d.street} (${d.zone})`} secondary={`${d.rooms_number} locali, ${d.square_meters}mq`} />
                             <ListItemSecondaryAction>
-                                <IconButton edge="end" aria-label="delete" onClick={_ => removeHouseMutation.mutate(d.id)}>
+                                <IconButton edge="end" aria-label="Remove element" onClick={_ => removeHouseMutation.mutate(d.id)}>
                                     <Delete />
                                 </IconButton>
                             </ListItemSecondaryAction>
@@ -46,7 +45,7 @@ export default function ListHouses() {
                     )
                 })
             }
-        </List>
+        </List >
     )
 }
 

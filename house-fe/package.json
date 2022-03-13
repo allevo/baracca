@@ -45,7 +45,11 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/react-hooks": "^7.0.2",
     "@types/leaflet": "^1.7.9",
-    "http-proxy-middleware": "^2.0.3"
+    "http-proxy-middleware": "^2.0.3",
+    "msw": "^0.39.1",
+    "nock": "^13.2.4",
+    "react-test-renderer": "^17.0.2"
   }
 }
