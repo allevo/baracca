@@ -88,6 +88,7 @@ const CustomMarker = ({ isActive, d, map }: { isActive?: boolean, d: HouseDTO, m
             <Popup ref={popupRef}>
                 <p><a target="_blank" href={d.link}>{d.link}</a></p>
                 <p>vote: {d.vote}</p>
+                <p>cost: {d.cost}</p>
                 <p>{d.street}, {d.rooms_number} locali, {d.square_meters} mq</p>
                 <p>{d.comment}</p>
             </Popup>

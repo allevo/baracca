@@ -110,6 +110,7 @@ function DiscoveryResult({ data }: { data: DiscoverResultDTO }) {
     return (<div>
         <p>{data.city} {data.street} ({data.zone})</p>
         <p>{data.rooms_number} locali, {data.square_meters}mq</p>
+        <p>costo {data.cost}</p>
     </div>
     )
 }
@@ -118,6 +119,7 @@ export interface InsertHouseDto extends DiscoverResultDTO {
     link: string,
     vote: number,
     comment: string,
+    cost?: number,
 }
 
 interface DiscoverResultDTO {
@@ -128,4 +130,5 @@ interface DiscoverResultDTO {
     square_meters?: number,
     street?: string,
     zone?: string,
+    cost?: number,
 }

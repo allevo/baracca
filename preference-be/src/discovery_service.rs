@@ -40,6 +40,7 @@ async fn fetch_data(s: &str) -> Result<DiscoveryResult, DiscoveryError> {
 
     extract_planimetry(&body, &mut discovery_result);
     extract_data(&body, &mut discovery_result);
+    extract_prices(&body, &mut discovery_result);
 
     Ok(discovery_result)
 }
@@ -53,6 +54,7 @@ pub struct DiscoveryResult {
     lng: Option<f64>,
     rooms_number: Option<u8>,
     square_meters: Option<u32>,
+    cost: Option<u32>,
 }
 
 fn extract_data(body: &str, discovery_result: &mut DiscoveryResult) {
@@ -115,6 +117,32 @@ fn extract_planimetry(body: &str, discovery_result: &mut DiscoveryResult) {
         .map(|l| l.to_string().trim().parse::<u32>().unwrap());
 }
 
+fn extract_prices(body: &str, discovery_result: &mut DiscoveryResult) {
+    let lines: Vec<_> = body
+        .lines()
+        .tuple_windows::<(_, _, _)>()
+        .filter(|(l, _, _)| l.contains(">prezzo<") || l.contains(">spese condominio<"))
+        .filter(|(_, _, l)| l.contains("€"))
+        .map(|(_, _, l)| l.trim())
+        .collect();
+
+    let cost: u32 = lines
+        .into_iter()
+        .filter_map(|l| {
+            l.to_string()
+                .replace("€", "")
+                .replace("/mese", "")
+                .trim()
+                .parse::<u32>()
+                .ok()
+        })
+        .sum();
+
+    if cost > 0 {
+        discovery_result.cost = Some(cost);
+    }
+}
+
 #[derive(Deserialize)]
 struct MapConfig {
     listing: Listing,
@@ -174,6 +202,7 @@ mod tests {
                 lng: Some(9.1775),
                 rooms_number: Some(2),
                 square_meters: Some(60),
+                cost: Some(1100)
             }
         );
     }

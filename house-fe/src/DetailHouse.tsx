@@ -51,6 +51,7 @@ export default function DetailHouse() {
         street,
         zone,
         id,
+        cost,
     } = houseQuery.data
 
     return (
@@ -67,6 +68,8 @@ export default function DetailHouse() {
                 <dd>{rooms_number}</dd>
                 <dt>Square meters</dt>
                 <dd>{square_meters}</dd>
+                <dt>Cost</dt>
+                <dd>{cost}</dd>
                 <dt>Link</dt>
                 <dd><a target={'_blank'} href={link}>{link}</a></dd>
                 <dt>Vote</dt>

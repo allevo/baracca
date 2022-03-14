@@ -142,6 +142,7 @@ pub struct HouseDTOInsert {
     pub lng: Option<f64>,
     pub rooms_number: Option<u8>,
     pub square_meters: Option<u32>,
+    pub cost: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -162,6 +163,7 @@ pub struct HouseEntity {
     lng: Option<f64>,
     rooms_number: Option<u8>,
     square_meters: Option<u32>,
+    cost: Option<u32>,
 }
 
 impl From<HouseDTOInsert> for HouseEntity {
@@ -179,6 +181,7 @@ impl From<HouseDTOInsert> for HouseEntity {
             lng: h.lng,
             rooms_number: h.rooms_number,
             square_meters: h.square_meters,
+            cost: h.cost,
         }
     }
 }
@@ -214,6 +217,7 @@ pub struct HouseDTO {
     lng: Option<f64>,
     rooms_number: Option<u8>,
     square_meters: Option<u32>,
+    cost: Option<u32>,
 }
 
 impl From<HouseEntity> for HouseDTO {
@@ -230,6 +234,7 @@ impl From<HouseEntity> for HouseDTO {
             lng: e.lng,
             rooms_number: e.rooms_number,
             square_meters: e.square_meters,
+            cost: e.cost,
         }
     }
 }

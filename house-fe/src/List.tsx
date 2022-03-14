@@ -42,7 +42,7 @@ export default function ListHouses() {
                 housesQuery.data.map(d => {
                     return (
                         <ListItem key={d.id} ContainerProps={{ 'data-testid': 'item-list-' + d.id } as HTMLAttributes<HTMLDivElement>}>
-                            <ListItemText primary={`${d.street} (${d.zone})`} secondary={`${d.rooms_number} locali, ${d.square_meters}mq`} />
+                            <ListItemText primary={`${d.street} (${d.zone})`} secondary={`${d.rooms_number} locali, ${d.square_meters}mq, € ${d.cost}/mese`} />
                             <ListItemSecondaryAction>
 
                                 <Link
