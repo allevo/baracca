@@ -17,7 +17,7 @@ futures = "0.3"
 mongodb = "2"
 envconfig = "0.10.0"
 
-reqwest = { version = "0.11", features = ["native-tls-vendored"] }
+reqwest = { version = "0.11", features = ["native-tls-vendored", "gzip", "brotli", "deflate"] }
 itertools = "0.10.2"
 
 [dev-dependencies]

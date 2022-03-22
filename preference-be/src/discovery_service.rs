@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use reqwest::{header, ClientBuilder};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -28,7 +29,26 @@ impl DiscoveryService {
 }
 
 async fn fetch_data(s: &str) -> Result<DiscoveryResult, DiscoveryError> {
-    let body = reqwest::get(s).await?;
+    let mut headers = header::HeaderMap::new();
+    headers.insert(
+        "accept-language",
+        header::HeaderValue::from_static("en-US,en;q=0.9"),
+    );
+    headers.insert(
+        "accept",
+        header::HeaderValue::from_static("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"),
+    );
+
+    let client = ClientBuilder::new()
+        .brotli(true)
+        .gzip(true)
+        .deflate(true)
+        .user_agent(" Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36 Edg/99.0.1150.46")
+        .default_headers(headers)
+        .build()
+        .unwrap();
+
+    let body = client.get(s).send().await?;
 
     if !body.status().is_success() {
         return Err(DiscoveryError::NotFound(s.to_owned()));
