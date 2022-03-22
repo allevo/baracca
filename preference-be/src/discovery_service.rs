@@ -42,6 +42,8 @@ async fn fetch_data(s: &str) -> Result<DiscoveryResult, DiscoveryError> {
     extract_data(&body, &mut discovery_result);
     extract_prices(&body, &mut discovery_result);
 
+    extract2(&body, &mut discovery_result);
+
     Ok(discovery_result)
 }
 
@@ -55,6 +57,72 @@ pub struct DiscoveryResult {
     rooms_number: Option<u8>,
     square_meters: Option<u32>,
     cost: Option<u32>,
+}
+
+fn extract2(body: &str, discovery_result: &mut DiscoveryResult) {
+    let rooms_number = body.lines().find(|l| l.contains(" locali<")).and_then(|l| {
+        l.replace("<li>", "")
+            .replace("</li>", "")
+            .replace(" locali", "")
+            .trim()
+            .parse::<u8>()
+            .ok()
+    });
+    let square_meters = body
+        .lines()
+        .find(|l| l.contains("m²") && l.contains("<li>"))
+        .and_then(|l| {
+            l.split_once("m²")
+                .and_then(|l| l.0.replace("<li>", "").trim().parse::<u32>().ok())
+        });
+    let cost = body.lines().find(|l| l.contains("€/mese")).and_then(|l| {
+        l.replace("<strong class=\"price\">", "")
+            .replace("</strong>", "")
+            .replace("€/mese", "")
+            .replace(".", "")
+            .trim()
+            .parse::<u32>()
+            .ok()
+    });
+
+    let lat = body
+        .lines()
+        .find(|l| l.contains("latitude: '"))
+        .and_then(|l| {
+            l.replace("latitude: '", "")
+                .replace("',", "")
+                .trim()
+                .parse::<f64>()
+                .ok()
+        });
+    let lng = body
+        .lines()
+        .find(|l| l.contains("longitude: '"))
+        .and_then(|l| {
+            l.replace("longitude: '", "")
+                .replace("',", "")
+                .trim()
+                .parse::<f64>()
+                .ok()
+        });
+    let m: Vec<_> = body
+        .lines()
+        .tuple_windows()
+        .filter(|(l, _)| l.contains("header-map-list"))
+        .map(|(_, l)| l)
+        .collect();
+    let street = m.first().map(|l| l.trim().to_string());
+    let city = m.last().map(|l| l.trim().to_string());
+    let zone = m.get(1).map(|l| l.trim().to_string());
+
+    discovery_result.city = discovery_result.city.clone().or(city);
+    discovery_result.zone = discovery_result.zone.clone().or(zone);
+    discovery_result.street = discovery_result.street.clone().or(street);
+    discovery_result.lat = discovery_result.lat.or(lat);
+    discovery_result.lng = discovery_result.lng.or(lng);
+    discovery_result.rooms_number = discovery_result.rooms_number.or(rooms_number);
+    discovery_result.square_meters = discovery_result.square_meters.or(square_meters);
+    discovery_result.cost = discovery_result.cost.or(cost);
 }
 
 fn extract_data(body: &str, discovery_result: &mut DiscoveryResult) {
@@ -204,6 +272,38 @@ mod tests {
                 rooms_number: Some(2),
                 square_meters: Some(60),
                 cost: Some(2100)
+            }
+        );
+    }
+
+    #[tokio::test]
+    async fn test_flow2() {
+        use httpmock::prelude::*;
+        let server = MockServer::start();
+
+        let url = "/foo";
+        let server_mock = server.mock(|when, then| {
+            when.method(GET).path(url);
+            then.status(200)
+                .header("content-type", "text/html")
+                .body(include_str!("page2.test.html"));
+        });
+        let service = DiscoveryService;
+        let a = service.discover(&server.url(url)).await.unwrap();
+
+        server_mock.assert();
+
+        assert_eq!(
+            a,
+            DiscoveryResult {
+                city: Some("Milano".to_string()),
+                zone: Some("Area Residenziale de angeli".to_string()),
+                street: Some("Viale Ranzoni, 19".to_string()),
+                lat: Some(45.4688239),
+                lng: Some(9.1451057),
+                rooms_number: Some(2),
+                square_meters: Some(70),
+                cost: Some(1200)
             }
         );
     }
