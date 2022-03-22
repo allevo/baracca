@@ -131,6 +131,7 @@ fn extract_prices(body: &str, discovery_result: &mut DiscoveryResult) {
         .filter_map(|l| {
             l.to_string()
                 .replace("€", "")
+                .replace(".", "")
                 .replace("/mese", "")
                 .trim()
                 .parse::<u32>()
@@ -202,7 +203,7 @@ mod tests {
                 lng: Some(9.1775),
                 rooms_number: Some(2),
                 square_meters: Some(60),
-                cost: Some(1100)
+                cost: Some(2100)
             }
         );
     }
