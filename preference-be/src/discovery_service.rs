@@ -56,12 +56,10 @@ async fn fetch_data(s: &str) -> Result<DiscoveryResult, DiscoveryError> {
         .build()
         .unwrap();
 
-    let response = reqwest_middleware::ClientBuilder::new(client)
-        .with(reqwest_tracing::TracingMiddleware)
-        .build()
-        .get(s)
-        .send()
-        .await?;
+    let req = client.get(s);
+    event!(Level::INFO, req = ?req, "req");
+
+    let response = req.send().await?;
 
     let status = response.status();
     let body = response.text().await?;
