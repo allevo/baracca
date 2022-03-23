@@ -1,16 +1,23 @@
 use itertools::Itertools;
 use reqwest::{header, ClientBuilder};
 use serde::{Deserialize, Serialize};
+use tracing::{event, Level};
 
 #[derive(Debug)]
 pub enum DiscoveryError {
     NotFound(String),
     ReqwestError(reqwest::Error),
+    ReqwestErrorMiddleware(reqwest_middleware::Error),
 }
 
 impl From<reqwest::Error> for DiscoveryError {
     fn from(r: reqwest::Error) -> Self {
         Self::ReqwestError(r)
+    }
+}
+impl From<reqwest_middleware::Error> for DiscoveryError {
+    fn from(r: reqwest_middleware::Error) -> Self {
+        Self::ReqwestErrorMiddleware(r)
     }
 }
 
@@ -23,7 +30,8 @@ impl DiscoveryService {
     }
 
     pub async fn discover(&self, url: &str) -> Result<DiscoveryResult, DiscoveryError> {
-        info!("discover url={}", url);
+        event!(Level::INFO, url = %url, "discovering");
+
         fetch_data(url).await
     }
 }
@@ -48,21 +56,35 @@ async fn fetch_data(s: &str) -> Result<DiscoveryResult, DiscoveryError> {
         .build()
         .unwrap();
 
-    let body = client.get(s).send().await?;
+    let response = reqwest_middleware::ClientBuilder::new(client)
+        .with(reqwest_tracing::TracingMiddleware)
+        .build()
+        .get(s)
+        .send()
+        .await?;
 
-    if !body.status().is_success() {
+    let status = response.status();
+    let body = response.text().await?;
+
+    if !status.is_success() {
+        event!(Level::WARN, body = %body, status = %status, "not success");
+
         return Err(DiscoveryError::NotFound(s.to_owned()));
     }
-
-    let body = body.text().await?;
 
     let mut discovery_result = DiscoveryResult::default();
 
     extract_planimetry(&body, &mut discovery_result);
+    event!(Level::INFO, discovery_result = ?discovery_result, "extraction");
+
     extract_data(&body, &mut discovery_result);
+    event!(Level::INFO, discovery_result = ?discovery_result, "extraction");
+
     extract_prices(&body, &mut discovery_result);
+    event!(Level::INFO, discovery_result = ?discovery_result, "extraction");
 
     extract2(&body, &mut discovery_result);
+    event!(Level::INFO, discovery_result = ?discovery_result, "extraction");
 
     Ok(discovery_result)
 }

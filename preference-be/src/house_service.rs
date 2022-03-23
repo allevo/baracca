@@ -8,6 +8,7 @@ use mongodb::{
     Collection,
 };
 use serde::{Deserialize, Serialize};
+use tracing::{event, Level};
 
 #[derive(Clone)]
 pub struct HousesService {
@@ -43,9 +44,9 @@ impl HousesService {
     pub async fn insert_house(&self, house: HouseDTOInsert) -> Result<HouseDTOInserted> {
         let house: HouseEntity = house.into();
 
-        info!("Inserting....");
+        event!(Level::INFO, "inserting");
         let res = self.collection.insert_one(house, None).await?;
-        info!("Inserted");
+        event!(Level::INFO, "inserted");
 
         res.try_into()
     }
@@ -53,6 +54,7 @@ impl HousesService {
     pub async fn remove_house(&self, house_id: String) -> Result<()> {
         let id = ObjectId::from_str(&house_id)?;
 
+        event!(Level::INFO, house_id = %house_id, "removing");
         let res = self
             .collection
             .update_one(
@@ -63,6 +65,7 @@ impl HousesService {
             .await?;
 
         if res.modified_count == 0 {
+            event!(Level::WARN, house_id = %house_id, "Not found");
             return Err(HousesServiceError::HouseNotFound(house_id));
         }
 
@@ -80,6 +83,9 @@ impl HousesService {
             )
             .await?;
         let houses: Vec<HouseEntity> = cur.try_collect().await?;
+
+        event!(Level::INFO, count = houses.len(), "found");
+
         let houses = houses.into_iter().map(HouseDTO::from).collect();
 
         Ok(houses)
@@ -88,6 +94,7 @@ impl HousesService {
     pub async fn get_house_by_id(&self, id: String) -> Result<HouseDTO> {
         let obj_id = ObjectId::from_str(&id)?;
 
+        event!(Level::INFO, house_id = %id, "find by id");
         let ret = self
             .collection
             .find_one(
@@ -115,6 +122,7 @@ impl HousesService {
             "comment": update_field.comment,
         } };
 
+        event!(Level::INFO, house_id = %id, "update");
         let ret = self
             .collection
             .find_one_and_update(filter, update, None)

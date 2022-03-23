@@ -3,6 +3,8 @@ mod discovery_service;
 mod house_service;
 mod http_handlers;
 
+use tracing_subscriber::fmt::format::FmtSpan;
+
 use config::{Config, MongoConfig};
 use house_service::HousesService;
 use mongodb::{
@@ -11,14 +13,21 @@ use mongodb::{
 };
 use warp::Filter;
 
-use crate::{discovery_service::DiscoveryService, http_handlers::log_req};
+use crate::discovery_service::DiscoveryService;
 
 #[macro_use]
 extern crate log;
 
 #[tokio::main]
 async fn main() {
-    pretty_env_logger::init();
+    let filter = std::env::var("RUST_LOG").unwrap_or("*".to_owned());
+    tracing_subscriber::fmt()
+        // Use the filter we built above to determine which traces to record.
+        .with_env_filter(filter)
+        // Record an event when each span closes. This can be used to time our
+        // routes' durations!
+        .with_span_events(FmtSpan::CLOSE)
+        .init();
 
     let config = Config::try_from_env().unwrap();
 
@@ -32,40 +41,34 @@ async fn main() {
     let discovery_service = warp::any().map(move || discovery_service.clone());
 
     let insert_house = warp::path!("api" / "houses")
-        .and(log_req())
         .and(warp::post())
         .and(warp::body::json())
         .and(houses_service.clone())
         .and_then(http_handlers::insert_house);
 
     let remove_house = warp::path!("api" / "houses" / String)
-        .and(log_req())
         .and(warp::delete())
         .and(houses_service.clone())
         .and_then(http_handlers::remove_house);
 
     let get_houses = warp::path!("api" / "houses")
         .and(warp::get())
-        .and(log_req())
         .and(houses_service.clone())
         .and_then(http_handlers::get_houses);
 
     let get_house_by_id = warp::path!("api" / "houses" / String)
         .and(warp::get())
-        .and(log_req())
         .and(houses_service.clone())
         .and_then(http_handlers::get_house_by_id);
 
     let update_house_by_id = warp::path!("api" / "houses" / String)
         .and(warp::patch())
         .and(warp::body::json())
-        .and(log_req())
         .and(houses_service.clone())
         .and_then(http_handlers::update_house_by_id);
 
     let discover = warp::path!("api" / "discover")
         .and(warp::get())
-        .and(log_req())
         .and(discovery_service.clone())
         .and(warp::query::<http_handlers::DiscoverQueryParameter>())
         .and_then(http_handlers::discover);
@@ -79,6 +82,7 @@ async fn main() {
         .or(remove_house)
         .or(discover)
         .or(static_files)
+        .with(warp::trace::request())
         .recover(http_handlers::handle_rejection);
 
     let server = warp::serve(router);

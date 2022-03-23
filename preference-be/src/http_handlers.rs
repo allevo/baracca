@@ -1,7 +1,5 @@
-use std::convert::Infallible;
-
 use serde::{Deserialize, Serialize};
-use warp::{hyper::StatusCode, path::FullPath, Filter, Rejection, Reply};
+use warp::{hyper::StatusCode, Rejection, Reply};
 
 use crate::{
     discovery_service::{DiscoveryError, DiscoveryResult, DiscoveryService},
@@ -61,14 +59,6 @@ pub async fn discover(
 #[derive(Deserialize)]
 pub struct DiscoverQueryParameter {
     url: String,
-}
-
-pub fn log_req() -> impl Filter<Extract = (), Error = Infallible> + Copy {
-    warp::path::full()
-        .map(|path: FullPath| {
-            println!("path={}", path.as_str());
-        })
-        .untuple_one()
 }
 
 /// Error handler. This could be written better for handling other errors,
