@@ -3,6 +3,8 @@ import { MapContainer, Marker, TileLayer, Popup } from "react-leaflet";
 import { useQuery } from "react-query";
 import { HouseDTO } from "./List";
 import HouseIcon from "./Mediamodifier-Design.svg";
+import M from "./M.png";
+import stops from './stops'
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -45,12 +47,26 @@ export default function MapHouses() {
 
     }
 
+
+    const s = 7
+    const mIcon = new DivIcon({
+        html: `<img src="${M}" width=${s} height=${s} alt="React Logo" />`,
+        iconSize: new Point(s, s),
+    })
+
     return (
         <MapContainer center={center} zoom={12} style={style} whenCreated={setMap}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {
+                stops.map(s => {
+                    return (
+                        <Marker position={[s.lat as number, s.lng as number]} key={JSON.stringify(s)} icon={mIcon} />
+                    )
+                })
+            }
             {
                 withPosition.map(d => {
                     return <CustomMarker
