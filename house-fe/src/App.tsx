@@ -55,7 +55,7 @@ function App() {
             direction="column"
             justifyContent="flex-start"
             alignItems="stretch"
-            style={{ padding: '20px', gap: '20px', flex: 1 }}
+            style={{ padding: '20px', gap: '20px', flex: 1, overflow: 'auto' }}
           >
             <Routes>
               <Route key='insert' path='insert' element={<InsertHouse />} />
